@@ -26,21 +26,7 @@ jobs:
       - name: Run selftest
         run: python skills/formula-typesetting/scripts/formula_norm.py selftest
 
-      # 语法与跨平台卫生检查：中文只能出现在注释和字符串里
+      # 跨平台卫生检查：中文只能出现在注释和字符串里
+      # 独立 .py 文件 ⇒ Windows runner（默认 shell 是 PowerShell）也能跑
       - name: Check scripts are portable
-        run: |
-          python - <<'PY'
-          import ast, sys
-          ok = True
-          for f in ("skills/formula-typesetting/scripts/formula_norm.py",
-                    "skills/formula-typesetting/scripts/pptx_omml_inject.py"):
-              src = open(f, encoding="utf-8").read()
-              tree = ast.parse(src)
-              bad = [n.name for n in ast.walk(tree)
-                     if isinstance(n, (ast.FunctionDef, ast.ClassDef))
-                     and any(ord(c) > 127 for c in n.name)]
-              if bad:
-                  print("non-ASCII identifier in %s: %s" % (f, bad))
-                  ok = False
-          sys.exit(0 if ok else 1)
-          PY
+        run: python tests/check_portable.py
