@@ -1,0 +1,12 @@
+# 统一换行：仓库内一律 LF，避免 Windows 检出时把 LF 变成 CRLF
+* text=auto eol=lf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.pdf binary
+*.pptx binary
+*.docx binary
+
+# Python：按文本处理，但保留 LF
+*.py text eol=lf

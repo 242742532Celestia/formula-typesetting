@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 排版管线的中间产物
+*.typ
+!tests/**/*.typ
+probe.pdf
+probe.md
+
+# 课件与讲义的渲染产物（示例里刻意保留的那几张除外）
+*.pptx
+!tests/**/*.pptx
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 临时
+*.tmp
+*.log
+scratch/
+_probe/

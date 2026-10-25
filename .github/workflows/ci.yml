@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  selftest:
+    name: selftest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      # 回归自测：18 条单元 + 8 条文档级
+      # 不需要 pandoc/typst —— selftest 是纯 Python 计算
+      - name: Run selftest
+        run: python skills/formula-typesetting/scripts/formula_norm.py selftest
+
+      # 语法与跨平台卫生检查：中文只能出现在注释和字符串里
+      - name: Check scripts are portable
+        run: |
+          python - <<'PY'
+          import ast, sys
+          ok = True
+          for f in ("skills/formula-typesetting/scripts/formula_norm.py",
+                    "skills/formula-typesetting/scripts/pptx_omml_inject.py"):
+              src = open(f, encoding="utf-8").read()
+              tree = ast.parse(src)
+              bad = [n.name for n in ast.walk(tree)
+                     if isinstance(n, (ast.FunctionDef, ast.ClassDef))
+                     and any(ord(c) > 127 for c in n.name)]
+              if bad:
+                  print("non-ASCII identifier in %s: %s" % (f, bad))
+                  ok = False
+          sys.exit(0 if ok else 1)
+          PY
