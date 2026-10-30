@@ -13,7 +13,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # 🔴 ubuntu-latest 已切到 Ubuntu 26.04, 而 actions/python-versions
+        #    没有 Python 3.9 的 26.04 构建 (实测 3.9.13 只有 20.04/22.04/24.04)
+        #    ⇒ 3.9 这一腿必须钉在 ubuntu-24.04, 否则 setup-python 直接报
+        #    "The version '3.9' ... was not found for Ubuntu 26.04"。
+        os: [ubuntu-24.04, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
 
